@@ -1,0 +1,218 @@
+{
+  "info": {
+    "_postman_id": "f6972632-023d-4f88-a952-768bf3614352",
+    "name": "crypto-api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33204620"
+  },
+  "item": [
+    {
+      "name": "product",
+      "item": [
+        {
+          "name": "Get Product Enums",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PUBLIC_API_HOST}}/products/enums",
+              "host": ["{{PUBLIC_API_HOST}}"],
+              "path": ["products", "enums"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PUBLIC_API_HOST}}/products?search=&blockchains=&categories=&minPrice=&maxPrice=&isNFT=&page=1&limit=10&sortBy=&orderBy=",
+              "host": ["{{PUBLIC_API_HOST}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "search by name or description"
+                },
+                {
+                  "key": "blockchains",
+                  "value": "",
+                  "description": "BTC, ETH, USDT, BNB, SOL, TON, NEAR"
+                },
+                {
+                  "key": "categories",
+                  "value": "",
+                  "description": "NFT, TOKEN, DEFI, GAMEFI, METAVERSE, OTHER"
+                },
+                {
+                  "key": "minPrice",
+                  "value": ""
+                },
+                {
+                  "key": "maxPrice",
+                  "value": ""
+                },
+                {
+                  "key": "isNFT",
+                  "value": "",
+                  "description": "true - false"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "",
+                  "description": "createdAt - updatedAt - price"
+                },
+                {
+                  "key": "orderBy",
+                  "value": "",
+                  "description": "desc - asc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PUBLIC_API_HOST}}/products/:id",
+              "host": ["{{PUBLIC_API_HOST}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "67983c8746e2467ba1a21650"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"test\",\n    \"description\": null, // IsOptional\n    \"price\": 100,\n    \"blockchain\": \"BTC\", // BTC, ETH, USDT, BNB, SOL, TON, NEAR\n    \"contractAddress\": null, // IsOptional\n    \"tokenId\": null, // IsOptional\n    \"category\": \"TOKEN\", // NFT, TOKEN, DEFI, GAMEFI, METAVERSE, OTHER\n    \"supply\": 1,\n    \"isNFT\": false,\n    \"imageUrl\": null // IsOptional\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{PUBLIC_API_HOST}}/products",
+              "host": ["{{PUBLIC_API_HOST}}"],
+              "path": ["products"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"test\",\n    \"description\": null, // IsOptional\n    \"price\": 100,\n    \"blockchain\": \"BTC\", // BTC, ETH, USDT, BNB, SOL, TON, NEAR\n    \"contractAddress\": null, // IsOptional\n    \"tokenId\": null, // IsOptional\n    \"category\": \"TOKEN\", // NFT, TOKEN, DEFI, GAMEFI, METAVERSE, OTHER\n    \"supply\": 1,\n    \"isNFT\": false,\n    \"imageUrl\": \"images/2025-01-28/2768148b-7e4a-4386-b00a-d876d40c5a46.jpg\", // IsOptional\n    \"metadata\": [  // IsOptional\n        {\n            \"traitType\": \"test\",\n            \"value\": 1\n        },\n        {\n            \"traitType\": \"test2\",\n            \"value\": \"kkk\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{PUBLIC_API_HOST}}/products/:id",
+              "host": ["{{PUBLIC_API_HOST}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "67983c8746e2467ba1a21650"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{PUBLIC_API_HOST}}/products/:id",
+              "host": ["{{PUBLIC_API_HOST}}"],
+              "path": ["products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "679837024355873b19b9fcc1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "upload",
+      "item": [
+        {
+          "name": "Upload Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "/Users/benq/Downloads/Cute-Cat.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{PUBLIC_API_HOST}}/uploads/image",
+              "host": ["{{PUBLIC_API_HOST}}"],
+              "path": ["uploads", "image"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{PUBLIC_API_HOST}}/health",
+          "host": ["{{PUBLIC_API_HOST}}"],
+          "path": ["health"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
