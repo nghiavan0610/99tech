@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant Client
+    participant LoadBalancer
+    participant APIServer
+    participant AuthService
+    participant ScoreService
+    participant Cache
+    participant DB
+    participant WebSocket
+
+    Client->>LoadBalancer: POST /api/scores/update
+    LoadBalancer->>APIServer: Forward Request
+    
+    APIServer->>AuthService: Validate JWT Token
+    AuthService-->>APIServer: Token Valid
+    
+    APIServer->>ScoreService: Update Score
+    ScoreService->>DB: Save New Score
+    ScoreService->>Cache: Update Cache
+    
+    alt Score in Top 10
+        ScoreService->>WebSocket: Broadcast Update
+        WebSocket-->>Client: Real-time Update
+    end
+    
+    DB-->>ScoreService: Confirm Save
+    ScoreService-->>APIServer: Update Success
+    APIServer-->>Client: 200 OK
+
+    note over Client,WebSocket: WebSocket Connection Flow
+    Client->>WebSocket: Connect to /ws/scoreboard
+    WebSocket->>AuthService: Validate Connection
+    AuthService-->>WebSocket: Connection Approved
+    WebSocket-->>Client: Connection Established

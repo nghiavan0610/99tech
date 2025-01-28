@@ -1,0 +1,49 @@
+sequenceDiagram
+    participant Client
+    participant CDN
+    participant LoadBalancer
+    participant APIGateway
+    participant AuthService
+    participant RateLimit
+    participant MessageQueue
+    participant ScoreService
+    participant CacheCluster
+    participant DBMaster
+    participant DBReplica
+    participant WebSocket
+    participant MonitoringService
+
+    Client->>CDN: Request Score Update
+    CDN->>LoadBalancer: Forward Request
+    LoadBalancer->>APIGateway: Route Request
+    
+    APIGateway->>AuthService: Validate JWT & Signature
+    AuthService->>RateLimit: Check Rate Limit
+    RateLimit-->>AuthService: Limit OK
+    AuthService-->>APIGateway: Auth Valid
+    
+    APIGateway->>MessageQueue: Queue Score Update
+    MessageQueue->>ScoreService: Process Update
+    
+    ScoreService->>DBMaster: Update Score
+    ScoreService->>CacheCluster: Update Cache
+    
+    par Query Replicas
+        ScoreService->>DBReplica: Get Top Scores
+        DBReplica-->>ScoreService: Return Scores
+    end
+    
+    alt Score in Top 10
+        ScoreService->>WebSocket: Broadcast Update
+        WebSocket-->>Client: Real-time Update
+    end
+    
+    DBMaster-->>ScoreService: Confirm Save
+    ScoreService-->>APIGateway: Update Success
+    APIGateway-->>Client: 200 OK
+
+    par Monitoring
+        ScoreService->>MonitoringService: Log Metrics
+        WebSocket->>MonitoringService: Connection Stats
+        DBMaster->>MonitoringService: DB Metrics
+    end
