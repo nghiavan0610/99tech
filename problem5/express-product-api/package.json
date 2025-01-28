@@ -1,5 +1,5 @@
 {
-    "name": "express-crypto-api",
+    "name": "express-product-api",
     "version": "1.0.0",
     "description": "Crypto Product API with Express and TypeScript",
     "license": "MIT",

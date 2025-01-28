@@ -43,7 +43,7 @@ const envVarSchema: Joi.ObjectSchema<IEnvVarSchema> = Joi.object()
         NODE_ENV: Joi.string().valid('local', 'dev', 'test', 'uat', 'prod').required(),
         HOST: Joi.string().default('localhost'),
         PORT: Joi.number().default(5001),
-        SERVICE_NAME: Joi.string().default('express-crypto-api'),
+        SERVICE_NAME: Joi.string().default('express-product-api'),
         LOGGER_LEVELS: Joi.string().default('error,warn,log'),
         ALLOWED_ORIGIN: Joi.string().default('*'),
         SERVER_TIMEZONE: Joi.string().default('Asia/Saigon'),
