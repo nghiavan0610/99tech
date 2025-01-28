@@ -49,7 +49,7 @@ MONGODB_URL=your_mongodb_url
 MONGODB_NAME=your_db_name
 MONGODB_AUTH=admin
 # Note: If you use NODE_ENV=prod, you need to provide the configuration below, otherwise it is not needed
-# You can use my certs to connect my database
+# You can use my certs to connect my database (certs folder)
 MONGODB_REPLICA_SET=your_replica_set
 MONGODB_CA_PATH=your_CA_path
 MONGODB_CERT_PATH=your_client_cert_path
