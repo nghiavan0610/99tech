@@ -1,0 +1,11 @@
+services:
+    nest-product-api:
+        image: benisme0610/99tech:nest-product-api-v1.0.1
+        container_name: nest-product-api
+        env_file: ./.env.prod
+        restart: unless-stopped
+        ports:
+            - ${PORT}:${PORT}
+        command: sh -c 'yarn run start:prod'
+        volumes:
+            - ./logs:/app/logs
