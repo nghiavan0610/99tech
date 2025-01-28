@@ -1,53 +1,43 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { IProductService } from './product-service.interface';
-import { ILoggerService } from '@/shared/modules/logger/services/logger-service.interface';
-import { InjectModel } from '@nestjs/mongoose';
-import { Product } from '../schemas/product.schema';
-import { FilterQuery, Model } from 'mongoose';
-import { CreateProductDto } from '../dtos/request/create-product.dto';
-import { ProductResponseDataDto } from '../dtos/response/product-response.dto';
-import { UpdateProductDto } from '../dtos/request/update-product.dto';
-import { ProductError } from '../enums/product-error.enum';
-import { CustomException } from '@/shared/exceptions/custom.exception';
-import { GetProductListDto } from '../dtos/request/get-product-list.dto';
-import { OrderByEnum, PgPagination } from '@/shared/types/pagination.type';
-import { ProductListResponseDto } from '../dtos/response/product-list-response.dto';
-import { ConfigService } from '@nestjs/config';
+import { FilterQuery } from 'mongoose';
+import httpStatus from 'http-status';
+import { logger } from '@shared/modules/logger';
+import { IProduct, ProductModel } from '@models/product.model';
+import CustomException from '@shared/exceptions/custom.exception';
+import { CreateProductDto } from '@controllers/api/product/dtos/request/create-product.dto';
+import { ProductResponseDataDto } from '@controllers/api/product/dtos/response/product-response.dto';
+import { GetProductListDto } from '@controllers/api/product/dtos/request/get-product-list.dto';
+import { ProductListResponseDto } from '@controllers/api/product/dtos/response/product-list-response.dto';
+import { OrderByEnum, PgPagination } from '@shared/types/pagination.type';
+import { ProductError } from '@controllers/api/product/enums/product-error.enum';
+import config from '@config/index';
 
-@Injectable()
-export class ProductService implements IProductService {
-    constructor(
-        private readonly configService: ConfigService,
-        @Inject(ILoggerService) private readonly logger: ILoggerService,
-        @InjectModel(Product.name) private readonly productModel: Model<Product>,
-    ) {}
-
+export class ProductService {
     // [DELETE] /products/:id
     async deleteProduct(id: string): Promise<boolean> {
-        this.logger.info('[DELETE PRODUCT] id', id);
+        logger.info('[DELETE PRODUCT] id', id);
 
-        const product = await this.productModel.findById(id);
+        const product = await ProductModel.findById(id);
         if (!product) {
             throw new CustomException({
                 message: ProductError.PRODUCT_NOT_FOUND,
-                statusCode: HttpStatus.BAD_REQUEST,
+                statusCode: httpStatus.BAD_REQUEST,
             });
         }
 
-        await this.productModel.deleteOne({ _id: id });
+        await ProductModel.deleteOne({ _id: id });
 
         return true;
     }
 
     // [PUT] /products/:id
-    async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<boolean> {
-        this.logger.info('[UPDATE PRODUCT] id - updateProductDto', id, updateProductDto);
+    async updateProduct(id: string, updateProductDto: Partial<IProduct>): Promise<boolean> {
+        logger.info('[UPDATE PRODUCT] id - updateProductDto', id, updateProductDto);
 
-        const product = await this.productModel.findById(id);
+        const product = await ProductModel.findById(id);
         if (!product) {
             throw new CustomException({
                 message: ProductError.PRODUCT_NOT_FOUND,
-                statusCode: HttpStatus.BAD_REQUEST,
+                statusCode: httpStatus.BAD_REQUEST,
             });
         }
 
@@ -55,24 +45,24 @@ export class ProductService implements IProductService {
         if (existedProductName) {
             throw new CustomException({
                 message: ProductError.PRODUCT_NAME_EXISTED,
-                statusCode: HttpStatus.BAD_REQUEST,
+                statusCode: httpStatus.BAD_REQUEST,
             });
         }
 
-        await this.productModel.updateOne({ _id: id }, updateProductDto);
+        await ProductModel.updateOne({ _id: id }, updateProductDto);
 
         return true;
     }
 
     // [GET] /products/:id
     async getProductDetail(id: string): Promise<ProductResponseDataDto> {
-        this.logger.info('[GET PRODUCT DETAIL] id', id);
+        logger.info('[GET PRODUCT DETAIL] id', id);
 
-        const product = await this.productModel.findById(id);
+        const product = await ProductModel.findById(id);
         if (!product) {
             throw new CustomException({
-                message: ProductError.PRODUCT_NOT_FOUND,
-                statusCode: HttpStatus.BAD_REQUEST,
+                message: 'Product not found',
+                statusCode: httpStatus.NOT_FOUND,
             });
         }
 
@@ -83,7 +73,7 @@ export class ProductService implements IProductService {
 
     // [GET] /products?search=&blockchains=&categories=&minPrice=&maxPrice=&isNFT=&page=&limit=&sortBy=&orderBy=
     async getProductList(getProductList: GetProductListDto): Promise<ProductListResponseDto> {
-        this.logger.info('[GET PRODUCT LIST] getProductList', getProductList);
+        logger.info('[GET PRODUCT LIST] getProductList', getProductList);
 
         const { blockchains, categories, isNFT, minPrice, maxPrice, search, sortBy, orderBy, page, limit } =
             getProductList;
@@ -121,8 +111,8 @@ export class ProductService implements IProductService {
         }
 
         const [products, totalCount] = await Promise.all([
-            this.productModel.find(filter).sort(sortOptions).skip(pagination.offset).limit(pagination.limit),
-            this.productModel.countDocuments(filter),
+            ProductModel.find(filter).sort(sortOptions).skip(pagination.offset).limit(pagination.limit),
+            ProductModel.countDocuments(filter),
         ]);
 
         // Presign image url
@@ -140,9 +130,10 @@ export class ProductService implements IProductService {
 
     // [POST] /products
     async createProduct(createProductDto: CreateProductDto): Promise<boolean> {
-        this.logger.info('[CREATE PRODUCT] createProductDto', createProductDto);
+        logger.info('[CREATE PRODUCT] createProductDto', createProductDto);
 
-        await this.productModel.create(createProductDto);
+        const product = new ProductModel(createProductDto);
+        await product.save();
 
         return true;
     }
@@ -150,26 +141,24 @@ export class ProductService implements IProductService {
     // ============================ START COMMON FUNCTION ============================
     private _presignImageUrl(url: string): string {
         if (url) {
-            const cdnUrl = this.configService.get('minIO.s3.cdn');
+            const cdnUrl = config.minIO.s3.cdn;
 
             if (cdnUrl) {
                 url = `${cdnUrl}/${url}`;
             } else {
-                url = [
-                    this.configService.get('minIO.s3.endpoint'),
-                    this.configService.get('minIO.s3.bucket'),
-                    url,
-                ].join('/');
+                url = [config.minIO.s3.endpoint, config.minIO.s3.bucket, url].join('/');
             }
         }
 
         return url;
     }
 
-    async _getProductForValidate(filter: FilterQuery<Product>, exceptId?: string): Promise<Product> {
+    async _getProductForValidate(filter: FilterQuery<IProduct>, exceptId?: string): Promise<IProduct> {
         const query = exceptId ? { _id: { $ne: exceptId }, ...filter } : { ...filter };
 
-        return this.productModel.findOne(query);
+        return ProductModel.findOne(query);
     }
     // ============================ END COMMON FUNCTION ==============================
 }
+
+export const productService = new ProductService();
