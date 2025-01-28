@@ -7,7 +7,6 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cors from 'cors';
-import { logger } from './shared/modules/logger';
 import { createServer } from 'http';
 import config from './config';
 import { globalSerializer } from '@shared/middlewares/global-serializer.middleware';

@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
 import config from '@config/index';
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 
 class HealthController {
     healthCheck(req: Request, res: Response) {

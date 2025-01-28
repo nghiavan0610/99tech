@@ -1,4 +1,3 @@
-import httpStatus from 'http-status';
 import dotenv from 'dotenv';
 import Joi from 'joi';
 import path from 'path';

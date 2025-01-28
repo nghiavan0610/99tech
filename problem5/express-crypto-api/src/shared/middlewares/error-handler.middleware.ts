@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { Error as MongooseError } from 'mongoose';
 import httpStatus from 'http-status';
 import CustomException from '@shared/exceptions/custom.exception';
 
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (err: Error, req: Request, res: Response) => {
     // Handle Unauthorized Errors
     if (err.name === 'UnauthorizedError') {
         return res.status(httpStatus.UNAUTHORIZED).send({
