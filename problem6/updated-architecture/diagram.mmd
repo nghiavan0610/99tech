@@ -26,7 +26,6 @@ sequenceDiagram
     MessageQueue->>ScoreService: Process Update
     
     ScoreService->>DBMaster: Update Score
-    ScoreService->>CacheCluster: Update Cache
     
     par Query Replicas
         ScoreService->>DBReplica: Get Top Scores
@@ -34,6 +33,7 @@ sequenceDiagram
     end
     
     alt Score in Top 10
+        ScoreService->>CacheCluster: Update Cache
         ScoreService->>WebSocket: Broadcast Update
         WebSocket-->>Client: Real-time Update
     end
